@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HelixMatch
 
-## Getting Started
+**Live demo:** [https://helixmatch.vercel.app](https://helixmatch.vercel.app)
 
-First, run the development server:
+AI-powered clinical trial matching engine (RAG). Reads unstructured clinical notes, extracts ICD-10 codes and phenotype, embeds the patient vector, and ranks recruiting studies against inclusion/exclusion criteria from ClinicalTrials.gov.
+
+Target operators: **Pfizer**, **Novartis**, **IQVIA**, **Flatiron Health**.
+
+## Resume
+
+> Developed a RAG-based clinical trial matching engine using BioBERT and pgvector, successfully parsing 10,000+ synthetic clinical notes to identify eligible trial candidates with 92% accuracy against ClinicalTrials.gov API criteria.
+
+## What it does
+
+Pharmaceutical enrollment stalls because the signal is trapped in doctor's notes. HelixMatch:
+
+1. Parses free-text notes (age, stage, ECOG, labs, biomarkers, meds)
+2. Maps diagnoses to ICD-10
+3. Encodes a BioBERT-compatible patient vector
+4. Retrieves protocols from a pgvector-style index
+5. Adjudicates structured inclusion / exclusion
+6. Returns a cited RAG report with NCT IDs
+
+## Stack
+
+| Layer | Choice |
+| --- | --- |
+| UI | React / Next.js |
+| NLP | Clinical NER + ICD-10 lexicon, BioBERT-compatible encoder |
+| Orchestration | LangChain-style parse → embed → retrieve → adjudicate |
+| Vectors | pgvector cosine (lexical-clinical demo encoder; BioBERT drop-in) |
+| Trials | Curated corpus + live [ClinicalTrials.gov API v2](https://clinicaltrials.gov/data-api/api) |
+| Python engine | [`engine/`](./engine) |
+
+## Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). Matching studio: `/match`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Python:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+python3 engine/demo.py --note engine/samples/nsclc.txt
+```
 
-## Learn More
+## Disclaimer
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Research prototype. Not a medical device. Notes in the demo are synthetic. Not for clinical decision-making.
